@@ -4,8 +4,8 @@ import(
 //	"fmt"
 	"os"
 	"context"
-//	"time"
-//	"net/http"
+	"time"
+	"net/http"
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -13,7 +13,7 @@ import(
 	"github.com/lambda-go-datadog/internal/adapter/handler"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-lambda-go/events"
-//	"github.com/DataDog/datadog-lambda-go"
+	"github.com/DataDog/datadog-lambda-go"
 //	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
 //	httptrace "gopkg.in/DataDog/dd-trace-go.v1/contrib/net/http"
 )
@@ -55,8 +55,8 @@ func main(){
 	log.Debug().Msg("--------------------")
 
 	datadogHandler		= handler.NewDatadogHandler()
-	lambda.Start(lambdaHandler)
-	//lambda.Start(ddlambda.WrapFunction(lambdaHandler, nil))
+	//lambda.Start(lambdaHandler)
+	lambda.Start(ddlambda.WrapFunction(lambdaHandler, nil))
 }
 
 func lambdaHandler(ctx context.Context, req events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
@@ -66,7 +66,7 @@ func lambdaHandler(ctx context.Context, req events.APIGatewayProxyRequest) (*eve
 				Msg("APIGateway Request.Body")
 	log.Debug().Msg("--------------------")
 
-	/*ddlambda.Metric(
+	ddlambda.Metric(
 		"coffee_house.order_value", // Metric name
 		12.45, // Metric value
 		"product:latte", 
@@ -91,8 +91,6 @@ func lambdaHandler(ctx context.Context, req events.APIGatewayProxyRequest) (*eve
 
 	//s, _ := tracer.StartSpanFromContext(ctx, "child.span")
 	//s.Finish()
-
-	*/
 
 	switch req.HTTPMethod {
 		case "GET":
