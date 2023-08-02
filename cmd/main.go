@@ -20,7 +20,7 @@ import(
 
 var (
 	logLevel 		= zerolog.DebugLevel // InfoLevel DebugLevel
-	version 		= "lambda go-datadog v 1.0"
+	version 		= "lambda go-datadog v 2.0"
 	datadogHandler 	*handler.DatadogHandler
 	response		*events.APIGatewayProxyResponse
 )
