@@ -3,7 +3,7 @@ version: 0.2
 env:
   variables:
     FUNCTION_NAME: lambda-go-datadog
-    ALIAS_NAME: lambda-go-datadog-version
+    ALIAS_NAME: live
     BUCKET_NAME: eliezerraj-908671954593-codepipeline
     CODEDEPLOY_APPLICATION_NAME: lambda-go-datadog-deploy
     CODEDEPLOY_APPLICATION_GROUP: lambda-go-datadog-deploy-group
@@ -17,7 +17,6 @@ phases:
   build: 
     commands: 
       - echo BUILD update lambda-function... 
-
       - LAMBDA_NEW_VERSION=$(aws lambda update-function-code --function-name ${FUNCTION_NAME} --s3-bucket ${BUCKET_NAME} --s3-key ${FUNCTION_NAME}/main.zip --publish | jq '.Version')
       - echo LAMBDA_NEW_VERSION $LAMBDA_NEW_VERSION 
 
