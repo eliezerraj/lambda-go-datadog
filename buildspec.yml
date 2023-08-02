@@ -25,6 +25,7 @@ phases:
       - cd "/go/src/${PACKAGE}"
       - echo Fetch all dependencies
       - go get -t ./...
+      - go mod tidy
 
   build:
     commands:

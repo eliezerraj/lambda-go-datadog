@@ -4,6 +4,8 @@ import(
 //	"fmt"
 	"os"
 	"context"
+	"time"
+	"net/http"
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -11,8 +13,9 @@ import(
 	"github.com/lambda-go-datadog/internal/adapter/handler"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-lambda-go/events"
-	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
-	httptrace "gopkg.in/DataDog/dd-trace-go.v1/contrib/net/http"
+	"github.com/DataDog/datadog-lambda-go"
+//	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
+//	httptrace "gopkg.in/DataDog/dd-trace-go.v1/contrib/net/http"
 )
 
 var (
@@ -62,19 +65,32 @@ func lambdaHandler(ctx context.Context, req events.APIGatewayProxyRequest) (*eve
 				Msg("APIGateway Request.Body")
 	log.Debug().Msg("--------------------")
 
-	req, _ := http.NewRequestWithContext(ctx, "GET", "https://www.datadoghq.com", nil)
-	client := http.Client{}
-	client = *httptrace.WrapClient(&client)
-	client.Do(req)
-
 	ddlambda.Metric(
 		"coffee_house.order_value", // Metric name
 		12.45, // Metric value
-		"product:latte", "order:online", // Associated tags  
+		"product:latte", 
+		"order:online", // Associated tags  
 	)
-	s, _ := tracer.StartSpanFromContext(ctx, "child.span")
-	s.Finish()
+
+	ddlambda.MetricWithTimestamp(
+		"coffee_house.order_value", // Metric name
+		12.45, // Metric value
+		time.Now(), // Timestamp, must be within last 20 mins
+		"product:latte", 
+		"order:online", // Associated tags
+	)
 	
+	req_apm, _ := http.NewRequestWithContext(ctx, "GET", "https://www.datadoghq.com", nil)
+	ddlambda.AddTraceHeaders(ctx, req_apm)
+
+	client := http.Client{}
+	client.Do(req_apm)
+	//client = *httptrace.WrapClient(&client)
+	//client.Do(req_apm)
+
+	//s, _ := tracer.StartSpanFromContext(ctx, "child.span")
+	//s.Finish()
+
 	switch req.HTTPMethod {
 		case "GET":
 			if (req.Resource == "/datadog/get"){
